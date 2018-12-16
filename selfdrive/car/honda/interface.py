@@ -92,7 +92,7 @@ class CarInterface(object):
     self.cam_can_invalid_count = 0
 
     self.cp = get_can_parser(CP)
-    self.cp_cam = get_cam_can_parser(CP)
+    # self.cp_cam = get_cam_can_parser(CP)
 
     # *** init the major players ***
     self.CS = CarState(CP)
@@ -151,10 +151,13 @@ class CarInterface(object):
       ret.safetyModel = car.CarParams.SafetyModels.hondaBosch
       ret.enableCamera = True
       ret.radarOffCan = True
+      ret.openpilotLongitudinalControl = False
     else:
       ret.safetyModel = car.CarParams.SafetyModels.honda
       ret.enableCamera = not any(x for x in CAMERA_MSGS if x in fingerprint)
       ret.enableGasInterceptor = 0x201 in fingerprint
+      ret.openpilotLongitudinalControl = ret.enableCamera
+
     cloudlog.warn("ECU Camera Simulated: %r", ret.enableCamera)
     cloudlog.warn("ECU Gas Interceptor: %r", ret.enableGasInterceptor)
 
@@ -393,9 +396,9 @@ class CarInterface(object):
     canMonoTimes = []
 
     self.cp.update(int(sec_since_boot() * 1e9), False)
-    self.cp_cam.update(int(sec_since_boot() * 1e9), False)
+    # self.cp_cam.update(int(sec_since_boot() * 1e9), False)
 
-    self.CS.update(self.cp, self.cp_cam)
+    self.CS.update(self.cp)
 
     # create message
     ret = car.CarState.new_message()
@@ -508,13 +511,13 @@ class CarInterface(object):
     else:
       self.can_invalid_count = 0
 
-    if not self.CS.cam_can_valid and self.CP.enableCamera:
-      self.cam_can_invalid_count += 1
-      # wait 1.0s before throwing the alert to avoid it popping when you turn off the car
-      if self.cam_can_invalid_count >= 100 and self.CS.CP.carFingerprint not in HONDA_BOSCH:
-        events.append(create_event('invalidGiraffeHonda', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-    else:
-      self.cam_can_invalid_count = 0
+    #if not self.CS.cam_can_valid and self.CP.enableCamera:
+    #  self.cam_can_invalid_count += 1
+    #  # wait 1.0s before throwing the alert to avoid it popping when you turn off the car
+    #  if self.cam_can_invalid_count >= 100 and self.CS.CP.carFingerprint not in HONDA_BOSCH:
+    #    events.append(create_event('invalidGiraffeHonda', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+    #else:
+    #  self.cam_can_invalid_count = 0
 
     if self.CS.steer_error:
       events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
