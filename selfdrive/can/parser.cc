@@ -244,7 +244,7 @@ class CANParser {
       // parse the messages
       for (int i = 0; i < msg_count; i++) {
        auto cmsg = cans[i];
-       if (cmsg.getSrc() != bus) {
+       if (cmsg.getSrc() != bus ) {
          if ((bus == 0) && (cmsg.getSrc() == 2)) {
            if ((cmsg.getAddress() == 399) || (cmsg.getAddress() == 892)) {
              DEBUG("%d: processing msg from bus 2\n", cmsg.getAddress());
@@ -257,7 +257,7 @@ class CANParser {
            continue;
          }
        }
-
+          
         auto state_it = message_states.find(cmsg.getAddress());
         if (state_it == message_states.end()) {
           // DEBUG("skip %d: not specified\n", cmsg.getAddress());
