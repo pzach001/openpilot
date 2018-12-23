@@ -1,3 +1,4 @@
+from cereal import car
 from collections import namedtuple
 from common.realtime import sec_since_boot
 from selfdrive.boardd.boardd import can_list_to_can_capnp
