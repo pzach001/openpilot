@@ -119,7 +119,6 @@ class CarInterface(object):
     ret.brakeMaxV = [1., 0.8]
 
     ret.enableCamera = not any(x for x in [970, 973, 984] if x in fingerprint)
-    ret.openpilotLongitudinalControl = False
     cloudlog.warn("ECU Camera Simulated: %r", ret.enableCamera)
 
     ret.steerLimitAlert = False

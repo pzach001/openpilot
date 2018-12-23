@@ -276,8 +276,7 @@ struct ThermalData {
   startedTs @13 :UInt64;
 
   thermalStatus @14 :ThermalStatus;
-  chargingError @17 :Bool;
-  chargingDisabled @18 :Bool;
+  chargerDisabled @17 :Bool;
 
   enum ThermalStatus {
     green @0;   # all processes run
@@ -345,7 +344,6 @@ struct LiveCalibrationData {
   warpMatrix @0 :List(Float32);
   # camera_frame_from_model_frame
   warpMatrix2 @5 :List(Float32);
-  warpMatrixBig @6 :List(Float32);
   calStatus @1 :Int8;
   calCycle @2 :Int32;
   calPerc @3 :Int8;
@@ -563,10 +561,6 @@ struct Plan {
   gpsTrajectory @12 :GpsTrajectory;
 
   gpsPlannerActive @19 :Bool;
-
-  # maps
-  vCurvature @21 :Float32;
-  decelForTurn @22 :Bool;
 
   struct GpsTrajectory {
     x @0 :List(Float32);
@@ -1573,17 +1567,8 @@ struct LiveParametersData {
 }
 
 struct LiveMapData {
-  speedLimitValid @0 :Bool;
+  valid @0 :Bool;
   speedLimit @1 :Float32;
-  curvatureValid @2 :Bool;
-  curvature @3 :Float32;
-  wayId @4 :UInt64;
-  roadX @5 :List(Float32);
-  roadY @6 :List(Float32);
-  lastGps @7: GpsLocationData;
-  roadCurvatureX @8 :List(Float32);
-  roadCurvature @9 :List(Float32);
-  distToTurn @10 :Float32;
 }
 
 
