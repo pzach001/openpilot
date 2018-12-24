@@ -151,13 +151,10 @@ class CarInterface(object):
       ret.safetyModel = car.CarParams.SafetyModels.hondaBosch
       ret.enableCamera = True
       ret.radarOffCan = True
-      ret.openpilotLongitudinalControl = False
     else:
       ret.safetyModel = car.CarParams.SafetyModels.honda
       ret.enableCamera = not any(x for x in CAMERA_MSGS if x in fingerprint)
       ret.enableGasInterceptor = 0x201 in fingerprint
-      ret.openpilotLongitudinalControl = ret.enableCamera
-
     cloudlog.warn("ECU Camera Simulated: %r", ret.enableCamera)
     cloudlog.warn("ECU Gas Interceptor: %r", ret.enableGasInterceptor)
 
