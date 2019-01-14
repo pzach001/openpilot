@@ -1356,7 +1356,6 @@ static void ui_draw_vision_maxspeed(UIState *s) {
   bool is_speedlim_valid = s->scene.speedlimit_valid;
   bool is_set_over_limit = is_speedlim_valid && s->scene.engaged &&
                        is_cruise_set && maxspeed_calc > (speedlim_calc + speed_lim_off);
-
   int viz_maxspeed_w = 184;
   int viz_maxspeed_h = 202;
   int viz_maxspeed_x = (ui_viz_rx + (bdr_s*2));
@@ -2527,7 +2526,6 @@ int main() {
     } else {
       read_is_metric(s);
     }
- 
     pthread_mutex_unlock(&s->lock);
 
     // the bg thread needs to be scheduled, so the main thread needs time without the lock
