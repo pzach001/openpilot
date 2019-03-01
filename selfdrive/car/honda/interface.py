@@ -367,7 +367,7 @@ class CarInterface(object):
     canMonoTimes = []
 
     self.cp.update(int(sec_since_boot() * 1e9), False)
-    self.cp_cam.update(int(sec_since_boot() * 1e9), False)
+#   self.cp_cam.update(int(sec_since_boot() * 1e9), False)
 
     self.CS.update(self.cp)
 
