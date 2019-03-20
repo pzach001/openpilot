@@ -133,7 +133,7 @@ class CarController(object):
     # **** process the car messages ****
 
     # *** compute control surfaces ***
-    BRAKE_MAX = 1024/4
+    BRAKE_MAX = 320 #1024/4
     if CS.CP.carFingerprint in (CAR.ACURA_ILX):
       STEER_MAX = 0xF00
     elif CS.CP.carFingerprint in (CAR.CRV, CAR.ACURA_RDX):
@@ -183,15 +183,10 @@ class CarController(object):
           can_sends.append(hondacan.create_gas_command(self.packer, apply_gas, idx))
 
       # radar at 20Hz, but these msgs need to be sent at 50Hz on ilx (seems like an Acura bug)
-      if CS.CP.carFingerprint == CAR.ACURA_ILX:
-        radar_send_step = 2
-      else:
-        radar_send_step = 5
+      radar_send_step = 5
 
       if (frame % radar_send_step) == 0:
         idx = (frame/radar_send_step) % 4
-#        if not self.new_radar_config:  # only change state once
-#          self.new_radar_config = car.RadarState.Error.wrongConfig in radar_error
-        can_sends.extend(hondacan.create_radar_commands(CS.v_ego, CS.CP.carFingerprint, self.new_radar_config, idx))
+      can_sends.extend(hondacan.create_radar_commands(CS.v_ego, CS.CP.carFingerprint, self.new_radar_config, idx))
 
     sendcan.send(can_list_to_can_capnp(can_sends, msgtype='sendcan').to_bytes())
