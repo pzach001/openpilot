@@ -22,7 +22,7 @@ def fix(msg, addr):
 
 def make_can_msg(addr, dat, idx, alt):
   if idx is not None:
-    dat += chr((idx % 256) << 4)
+    dat += chr(idx << 4)
     dat = fix(dat, addr)
   return [addr, 0, dat, alt]
 
