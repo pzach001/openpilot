@@ -7,6 +7,7 @@ from selfdrive.car import create_gas_command
 from selfdrive.car.honda import hondacan
 from selfdrive.car.honda.values import AH, CruiseButtons, CAR
 from selfdrive.can.packer import CANPacker
+from common.params import Params
 
 def actuator_hystereses(brake, braking, brake_steady, v_ego, car_fingerprint):
   # hyst params
@@ -84,6 +85,14 @@ class CarController(object):
     self.enable_camera = enable_camera
     self.packer = CANPacker(dbc_name)
     self.new_radar_config = False
+    #self.params = Params()
+    self.is_metric = Params().get("IsMetric") == "1"
+    if self.is_metric:
+      self.speed_units = 2
+    else:
+      self.speed_units = 3
+
+
 
   def update(self, sendcan, enabled, CS, frame, actuators, \
              pcm_speed, pcm_override, pcm_cancel_cmd, pcm_accel, \
