@@ -128,8 +128,8 @@ class CarController(object):
     #print chime, alert_id, hud_alert
     fcw_display, steer_required, acc_alert = process_hud_alert(hud_alert)
 
-    hud = HUDData(int(pcm_accel), int(round(hud_v_cruise)), 1, hud_car,
-                  0xc1, hud_lanes, int(snd_beep), snd_chime, fcw_display, acc_alert, steer_required)
+#    hud = HUDData(int(pcm_accel), int(round(hud_v_cruise)), 1, hud_car,
+#                  0xc1, hud_lanes, int(snd_beep), snd_chime, fcw_display, acc_alert, steer_required)
 
     # **** process the car messages ****
 
