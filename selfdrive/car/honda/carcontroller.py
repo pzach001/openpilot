@@ -86,7 +86,7 @@ class CarController(object):
     self.packer = CANPacker(dbc_name)
     self.new_radar_config = False
 
-  def update(self, sendcan, enabled, CS, frame, actuators, \
+  def update1(self, sendcan, enabled, CS, frame, actuators, \
              pcm_speed, pcm_override, pcm_cancel_cmd, pcm_accel, \
              hud_v_cruise, hud_show_lanes, hud_show_car, \
              hud_alert, snd_beep, snd_chime):
