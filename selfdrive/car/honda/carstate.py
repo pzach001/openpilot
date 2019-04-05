@@ -185,7 +185,7 @@ class CarState(object):
 
     # update prevs, update must run once per loop
     self.prev_cruise_buttons = self.cruise_buttons
-    self.prev_cruise_setting = self.cruise_setting
+    #self.prev_cruise_setting = self.cruise_setting
     self.prev_blinker_on = self.blinker_on
 
     self.prev_left_blinker_on = self.left_blinker_on
@@ -244,7 +244,7 @@ class CarState(object):
     self.angle_steers = cp.vl["STEERING_SENSORS"]['STEER_ANGLE']
     self.angle_steers_rate = cp.vl["STEERING_SENSORS"]['STEER_ANGLE_RATE']
 
-    self.cruise_setting = cp.vl["SCM_BUTTONS"]['CRUISE_SETTING']
+    #self.cruise_setting = cp.vl["SCM_BUTTONS"]['CRUISE_SETTING']
     self.cruise_buttons = cp.vl["SCM_BUTTONS"]['CRUISE_BUTTONS']
 
     self.blinker_on = cp.vl["SCM_FEEDBACK"]['LEFT_BLINKER'] or cp.vl["SCM_FEEDBACK"]['RIGHT_BLINKER']
