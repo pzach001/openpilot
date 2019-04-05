@@ -142,6 +142,9 @@ def get_cam_can_parser(CP):
 class CarState(object):
   def __init__(self, CP):
 
+    #self.lkMode = True
+    self.trMode = 1
+    self.read_distance_lines_prev = 1
     self.CP = CP
     self.can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = self.can_define.dv["GEARBOX"]["GEAR_SHIFTER"]
