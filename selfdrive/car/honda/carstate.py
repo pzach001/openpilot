@@ -141,6 +141,10 @@ def get_cam_can_parser(CP):
 
 class CarState(object):
   def __init__(self, CP):
+    #lines
+    self.lkMode = True
+    self.trMode = 1
+    self.read_distance_lines_prev = 1
     self.CP = CP
     self.can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = self.can_define.dv["GEARBOX"]["GEAR_SHIFTER"]
@@ -169,11 +173,11 @@ class CarState(object):
                          K=[[0.12287673], [0.29666309]])
     self.v_ego = 0.0
 
-  def update(self, cp):
+  def update(self, cp): #Clarity
 
     # copy can_valid on buses 0 and 2
     self.can_valid = cp.can_valid
-#   self.cam_can_valid = cp_cam.can_valid
+    #self.cam_can_valid = cp_cam.can_valid  #Clarity
 
     # car params
     v_weight_v = [0., 1.]  # don't trust smooth speed at low values to avoid premature zero snapping
@@ -181,7 +185,7 @@ class CarState(object):
 
     # update prevs, update must run once per loop
     self.prev_cruise_buttons = self.cruise_buttons
-    self.prev_cruise_setting = self.cruise_setting
+    #self.prev_cruise_setting = self.cruise_setting #lines
     self.prev_blinker_on = self.blinker_on
 
     self.prev_left_blinker_on = self.left_blinker_on
@@ -203,7 +207,7 @@ class CarState(object):
     self.steer_error = cp.vl["STEER_STATUS"]['STEER_STATUS'] not in [0, 2, 3, 4, 6]
     self.steer_not_allowed = cp.vl["STEER_STATUS"]['STEER_STATUS']  not in [0, 4]  # 4 can be caused by bump OR steering nudge from driver
     self.steer_warning = cp.vl["STEER_STATUS"]['STEER_STATUS'] not in [0, 3, 4]   # 3 is low speed lockout, not worth a warning
-    if self.CP.carFingerprint == CAR.CLARITY:
+    if self.CP.carFingerprint == CAR.CLARITY: #Clarity
       self.brake_error = 0
     else:
       self.brake_error = cp.vl["STANDSTILL"]['BRAKE_ERROR_1'] or cp.vl["STANDSTILL"]['BRAKE_ERROR_2']
@@ -240,7 +244,7 @@ class CarState(object):
     self.angle_steers = cp.vl["STEERING_SENSORS"]['STEER_ANGLE']
     self.angle_steers_rate = cp.vl["STEERING_SENSORS"]['STEER_ANGLE_RATE']
 
-    self.cruise_setting = cp.vl["SCM_BUTTONS"]['CRUISE_SETTING']
+    #self.cruise_setting = cp.vl["SCM_BUTTONS"]['CRUISE_SETTING'] #lines
     self.cruise_buttons = cp.vl["SCM_BUTTONS"]['CRUISE_BUTTONS']
 
     self.blinker_on = cp.vl["SCM_FEEDBACK"]['LEFT_BLINKER'] or cp.vl["SCM_FEEDBACK"]['RIGHT_BLINKER']
@@ -248,7 +252,7 @@ class CarState(object):
     self.right_blinker_on = cp.vl["SCM_FEEDBACK"]['RIGHT_BLINKER']
     self.brake_hold = cp.vl["VSA_STATUS"]['BRAKE_HOLD_ACTIVE']
 
-    if self.CP.carFingerprint in (CAR.CIVIC, CAR.ODYSSEY, CAR.CRV_5G, CAR.ACCORD, CAR.ACCORD_15, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CLARITY):
+    if self.CP.carFingerprint in (CAR.CIVIC, CAR.ODYSSEY, CAR.CRV_5G, CAR.ACCORD, CAR.ACCORD_15, CAR.ACCORDH, CAR.CIVIC_BOSCH, CAR.CLARITY): #Clarity
       self.park_brake = cp.vl["EPB_STATUS"]['EPB_STATE'] != 0
       self.main_on = cp.vl["SCM_FEEDBACK"]['MAIN_ON']
     else:
@@ -306,6 +310,26 @@ class CarState(object):
     if self.CP.carFingerprint in (CAR.PILOT, CAR.PILOT_2019, CAR.RIDGELINE):
       if self.user_brake > 0.05:
         self.brake_pressed = 1
+    #lines
+    # when user presses distance button on steering wheel
+    if self.cruise_setting == 3:
+      if cp.vl["SCM_BUTTONS"]["CRUISE_SETTING"] == 0:
+        self.trMode = (self.trMode + 1 ) % 4
+    #lines    
+    # when user presses LKAS button on steering wheel
+    if self.cruise_setting == 1:
+      if cp.vl["SCM_BUTTONS"]["CRUISE_SETTING"] == 0:
+        if self.lkMode:
+          self.lkMode = False
+        else:
+          self.lkMode = True
+    #lines    
+    self.prev_cruise_setting = self.cruise_setting
+    self.cruise_setting = cp.vl["SCM_BUTTONS"]['CRUISE_SETTING']
+    self.read_distance_lines = self.trMode + 1
+    #lines
+    if self.read_distance_lines <> self.read_distance_lines_prev:
+      self.read_distance_lines_prev = self.read_distance_lines
 
 # carstate standalone tester
 if __name__ == '__main__':

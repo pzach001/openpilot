@@ -1,4 +1,4 @@
-from cereal import car
+from cereal import car #Clarity
 from collections import namedtuple
 from common.realtime import sec_since_boot
 from selfdrive.boardd.boardd import can_list_to_can_capnp
@@ -8,6 +8,7 @@ from selfdrive.car import create_gas_command
 from selfdrive.car.honda import hondacan
 from selfdrive.car.honda.values import AH, CruiseButtons, CAR
 from selfdrive.can.packer import CANPacker
+from common.params import Params #lines
 
 def actuator_hystereses(brake, braking, brake_steady, v_ego, car_fingerprint):
   # hyst params
@@ -34,7 +35,7 @@ def actuator_hystereses(brake, braking, brake_steady, v_ego, car_fingerprint):
 
   return brake, braking, brake_steady
 
-
+#Clarity
 #def brake_pump_hysteresys(apply_brake, apply_brake_last, last_pump_ts):
 #  ts = sec_since_boot()
 #  pump_on = False
@@ -69,10 +70,10 @@ def process_hud_alert(hud_alert):
 
   return fcw_display, steer_required, acc_alert
 
-
+#lines
 HUDData = namedtuple("HUDData",
                      ["pcm_accel", "v_cruise", "mini_car", "car", "X4",
-                      "lanes", "beep", "chime", "fcw", "acc_alert", "steer_required"])
+                      "lanes", "beep", "chime", "fcw", "acc_alert", "steer_required", "dist_lines", "dashed_lanes", "speed_units"])
 
 
 class CarController(object):
@@ -80,11 +81,18 @@ class CarController(object):
     self.braking = False
     self.brake_steady = 0.
     self.brake_last = 0.
-#    self.apply_brake_last = 0
-#    self.last_pump_ts = 0
+    #Clarity
+    #self.apply_brake_last = 0
+    #self.last_pump_ts = 0
     self.enable_camera = enable_camera
     self.packer = CANPacker(dbc_name)
     self.new_radar_config = False
+    #lines
+    self.is_metric = Params().get("IsMetric") == "1"
+    if self.is_metric:
+      self.speed_units = 2
+    else:
+      self.speed_units = 3
 
   def update(self, sendcan, enabled, CS, frame, actuators, \
              pcm_speed, pcm_override, pcm_cancel_cmd, pcm_accel, \
@@ -127,14 +135,14 @@ class CarController(object):
 
     #print chime, alert_id, hud_alert
     fcw_display, steer_required, acc_alert = process_hud_alert(hud_alert)
-
+    #lines
     hud = HUDData(int(pcm_accel), int(round(hud_v_cruise)), 1, hud_car,
-                  0xc1, hud_lanes, int(snd_beep), snd_chime, fcw_display, acc_alert, steer_required)
+                  0xc1, hud_lanes, int(snd_beep), snd_chime, fcw_display, acc_alert, steer_required, CS.read_distance_lines, CS.lkMode, self.speed_units)
 
     # **** process the car messages ****
 
     # *** compute control surfaces ***
-    BRAKE_MAX = 382 #1024/4
+    BRAKE_MAX = 382 #Clarity
     if CS.CP.carFingerprint in (CAR.ACURA_ILX):
       STEER_MAX = 0xF00
     elif CS.CP.carFingerprint in (CAR.CRV, CAR.ACURA_RDX):
@@ -172,20 +180,21 @@ class CarController(object):
     else:
       # Send gas and brake commands.
       if (frame % 2) == 0:
+        #Clarity
         idx = (frame / 2) % 4
-#       pump_on, self.last_pump_ts = brake_pump_hysteresys(apply_brake, self.apply_brake_last, self.last_pump_ts)
+        #pump_on, self.last_pump_ts = brake_pump_hysteresys(apply_brake, self.apply_brake_last, self.last_pump_ts)
         can_sends.extend(hondacan.create_brake_command(self.packer, apply_brake,
           pcm_override, pcm_cancel_cmd, hud.chime, hud.fcw, CS.CP.carFingerprint, idx))
-#       self.apply_brake_last = apply_brake
+        #self.apply_brake_last = apply_brake
 
         if CS.CP.enableGasInterceptor:
           # send exactly zero if apply_gas is zero. Interceptor will send the max between read value and apply_gas.
           # This prevents unexpected pedal range rescaling
-          can_sends.append(hondacan.create_gas_command(self.packer, apply_gas, idx))
+          can_sends.append(hondacan.create_gas_command(self.packer, apply_gas, idx))#Clarity
 
+      #Clarity
       # radar at 20Hz, but these msgs need to be sent at 50Hz on ilx (seems like an Acura bug)
       radar_send_step = 5
-
       if (frame % radar_send_step) == 0:
         idx = (frame/radar_send_step) % 4
       can_sends.extend(hondacan.create_radar_commands(CS.v_ego, CS.CP.carFingerprint, self.new_radar_config, idx))

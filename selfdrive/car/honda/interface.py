@@ -92,7 +92,7 @@ class CarInterface(object):
     self.cam_can_invalid_count = 0
 
     self.cp = get_can_parser(CP)
-#   self.cp_cam = get_cam_can_parser(CP)
+    #self.cp_cam = get_cam_can_parser(CP) #Clarity
 
     # *** init the major players ***
     self.CS = CarState(CP)
@@ -204,7 +204,6 @@ class CarInterface(object):
       ret.longitudinalKpV = [3.6, 2.4, 1.5]
       ret.longitudinalKiBP = [0., 35.]
       ret.longitudinalKiV = [0.54, 0.36]
-
     elif candidate == CAR.CLARITY:
       stop_and_go = True
       ret.mass = 4052. * CV.LB_TO_KG + std_cargo
@@ -380,9 +379,9 @@ class CarInterface(object):
     canMonoTimes = []
 
     self.cp.update(int(sec_since_boot() * 1e9), False)
-#   self.cp_cam.update(int(sec_since_boot() * 1e9), False)
+    #self.cp_cam.update(int(sec_since_boot() * 1e9), False) #Clarity
 
-    self.CS.update(self.cp)
+    self.CS.update(self.cp) #Clarity
 
     # create message
     ret = car.CarState.new_message()
@@ -429,6 +428,9 @@ class CarInterface(object):
     ret.cruiseState.available = bool(self.CS.main_on)
     ret.cruiseState.speedOffset = self.CS.cruise_speed_offset
     ret.cruiseState.standstill = False
+    #lines
+    ret.readdistancelines = self.CS.read_distance_lines
+    ret.lkMode = self.CS.lkMode
 
     # TODO: button presses
     buttonEvents = []
@@ -494,7 +496,7 @@ class CarInterface(object):
         events.append(create_event('commIssue', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
     else:
       self.can_invalid_count = 0
-
+#Clarity
 #    if not self.CS.cam_can_valid and self.CP.enableCamera:
 #      self.cam_can_invalid_count += 1
 #      # wait 1.0s before throwing the alert to avoid it popping when you turn off the car
