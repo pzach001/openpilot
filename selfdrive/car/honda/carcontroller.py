@@ -1,3 +1,4 @@
+from cereal import car #Clarity
 from collections import namedtuple
 from common.realtime import sec_since_boot
 from selfdrive.boardd.boardd import can_list_to_can_capnp
@@ -12,9 +13,9 @@ def actuator_hystereses(brake, braking, brake_steady, v_ego, car_fingerprint):
   # hyst params
   brake_hyst_on = 0.02     # to activate brakes exceed this value
   brake_hyst_off = 0.005                     # to deactivate brakes below this value
-  brake_hyst_gap = 0.01                      # don't change brake command for small ocilalitons within this value
+  brake_hyst_gap = 0.01                      # don't change brake command for small oscillations within this value
 
-  #*** histeresis logic to avoid brake blinking. go above 0.1 to trigger
+  #*** hysteresis logic to avoid brake blinking. go above 0.1 to trigger
   if (brake < brake_hyst_on and not braking) or brake < brake_hyst_off:
     brake = 0.
   braking = brake > 0.
@@ -33,23 +34,23 @@ def actuator_hystereses(brake, braking, brake_steady, v_ego, car_fingerprint):
 
   return brake, braking, brake_steady
 
-
-def brake_pump_hysteresys(apply_brake, apply_brake_last, last_pump_ts):
-  ts = sec_since_boot()
-  pump_on = False
-
-  # reset pump timer if:
-  # - there is an increment in brake request
-  # - we are applying steady state brakes and we haven't been running the pump
-  #   for more than 20s (to prevent pressure bleeding)
-  if apply_brake > apply_brake_last or (ts - last_pump_ts > 20 and apply_brake > 0):
-    last_pump_ts = ts
-
-  # once the pump is on, run it for at least 0.2s
-  if ts - last_pump_ts < 0.2 and apply_brake > 0:
-    pump_on = True
-
-  return pump_on, last_pump_ts
+#Clarity
+#def brake_pump_hysteresys(apply_brake, apply_brake_last, last_pump_ts):
+#  ts = sec_since_boot()
+#  pump_on = False
+#
+#  # reset pump timer if:
+#  # - there is an increment in brake request
+#  # - we are applying steady state brakes and we haven't been running the pump
+#  #   for more than 20s (to prevent pressure bleeding)
+#  if apply_brake > apply_brake_last or (ts - last_pump_ts > 20 and apply_brake > 0):
+#    last_pump_ts = ts
+#
+#  # once the pump is on, run it for at least 0.2s
+#  if ts - last_pump_ts < 0.2 and apply_brake > 0:
+#    pump_on = True
+#
+#  return pump_on, last_pump_ts
 
 
 def process_hud_alert(hud_alert):
@@ -79,8 +80,9 @@ class CarController(object):
     self.braking = False
     self.brake_steady = 0.
     self.brake_last = 0.
-    self.apply_brake_last = 0
-    self.last_pump_ts = 0
+    #Clarity
+    #self.apply_brake_last = 0
+    #self.last_pump_ts = 0
     self.enable_camera = enable_camera
     self.packer = CANPacker(dbc_name)
     self.new_radar_config = False
@@ -133,7 +135,7 @@ class CarController(object):
     # **** process the car messages ****
 
     # *** compute control surfaces ***
-    BRAKE_MAX = 1024/4
+    BRAKE_MAX = 382 #Clarity
     if CS.CP.carFingerprint in (CAR.ACURA_ILX):
       STEER_MAX = 0xF00
     elif CS.CP.carFingerprint in (CAR.CRV, CAR.ACURA_RDX):
@@ -160,7 +162,7 @@ class CarController(object):
 
     # Send dashboard UI commands.
     if (frame % 10) == 0:
-      idx = (frame/10) % 4
+      idx = (frame//10) % 4
       can_sends.extend(hondacan.create_ui_commands(self.packer, pcm_speed, hud, CS.CP.carFingerprint, idx))
 
     if CS.CP.radarOffCan:
@@ -173,15 +175,23 @@ class CarController(object):
     else:
       # Send gas and brake commands.
       if (frame % 2) == 0:
-        idx = frame / 2
-        pump_on, self.last_pump_ts = brake_pump_hysteresys(apply_brake, self.apply_brake_last, self.last_pump_ts)
-        can_sends.append(hondacan.create_brake_command(self.packer, apply_brake, pump_on,
-          pcm_override, pcm_cancel_cmd, hud.chime, hud.fcw, idx))
-        self.apply_brake_last = apply_brake
+        #Clarity
+        idx = (frame / 2) % 4
+        #pump_on, self.last_pump_ts = brake_pump_hysteresys(apply_brake, self.apply_brake_last, self.last_pump_ts)
+        can_sends.extend(hondacan.create_brake_command(self.packer, apply_brake,
+          pcm_override, pcm_cancel_cmd, hud.chime, hud.fcw, CS.CP.carFingerprint, idx))
+        #self.apply_brake_last = apply_brake
 
         if CS.CP.enableGasInterceptor:
           # send exactly zero if apply_gas is zero. Interceptor will send the max between read value and apply_gas.
           # This prevents unexpected pedal range rescaling
-          can_sends.append(create_gas_command(self.packer, apply_gas, idx))
+          can_sends.append(hondacan.create_gas_command(self.packer, apply_gas, idx))#Clarity
+
+      #Clarity
+      # radar at 20Hz, but these msgs need to be sent at 50Hz on ilx (seems like an Acura bug)
+      radar_send_step = 5
+      if (frame % radar_send_step) == 0:
+        idx = (frame/radar_send_step) % 4
+      can_sends.extend(hondacan.create_radar_commands(CS.v_ego, CS.CP.carFingerprint, self.new_radar_config, idx))
 
     sendcan.send(can_list_to_can_capnp(can_sends, msgtype='sendcan').to_bytes())
