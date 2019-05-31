@@ -35,7 +35,7 @@ def actuator_hystereses(brake, braking, brake_steady, v_ego, car_fingerprint):
   return brake, braking, brake_steady
 
 #Clarity
-#def brake_pump_hysteresys(apply_brake, apply_brake_last, last_pump_ts):
+#def brake_pump_hysteresis(apply_brake, apply_brake_last, last_pump_ts):
 #  ts = sec_since_boot()
 #  pump_on = False
 #
