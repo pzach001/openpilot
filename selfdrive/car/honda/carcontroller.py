@@ -162,7 +162,7 @@ class CarController(object):
 
     # Send dashboard UI commands.
     if (frame % 10) == 0:
-      idx = (frame//10) % 4
+      idx = (frame/10) % 4
       can_sends.extend(hondacan.create_ui_commands(self.packer, pcm_speed, hud, CS.CP.carFingerprint, idx))
 
     if CS.CP.radarOffCan:

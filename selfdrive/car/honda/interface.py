@@ -198,6 +198,12 @@ class CarInterface(object):
       if is_fw_modified:
         ret.lateralTuning.pid.kf = 0.00004
 
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.4], [0.12]] if is_fw_modified else [[0.8], [0.24]]
+      ret.longitudinalTuning.kpBP = [0., 5., 35.]
+      ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
+      ret.longitudinalTuning.kiBP = [0., 35.]
+      ret.longitudinalTuning.kiV = [0.54, 0.36]
+
     elif candidate == CAR.CLARITY:
       stop_and_go = True
       ret.mass = 4052. * CV.LB_TO_KG + std_cargo
@@ -205,8 +211,7 @@ class CarInterface(object):
       ret.centerToFront = ret.wheelbase * 0.4
       ret.steerRatio = 17.03  # 12.72 is end-to-end spec
       tire_stiffness_factor = 1.
-
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.4], [0.12]] if is_fw_modified else [[0.8], [0.24]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.8], [0.24]]
       ret.longitudinalTuning.kpBP = [0., 5., 35.]
       ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
       ret.longitudinalTuning.kiBP = [0., 35.]
