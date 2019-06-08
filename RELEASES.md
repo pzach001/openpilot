@@ -1,3 +1,27 @@
+Version 0.5.13 (2019-05-31)
+==========================
+ * Reduce panda power consumption by 70%, down to 80mW, when car is off (not for GM)
+ * Reduce EON power consumption by 40%, down to 1100mW, when car is off
+ * Reduce CPU utilization by 20% and improve stability
+ * Temporarily remove mapd functionalities to improve stability
+ * Add openpilot record-only mode for unsupported cars
+ * Synchronize controlsd to boardd to reduce latency
+ * Remove panda support for Subaru giraffe
+
+Version 0.5.12 (2019-05-16)
+==========================
+ * Improve lateral control for the Prius and Prius Prime
+ * Compress logs before writing to disk
+ * Remove old driving data when storage reaches 90% full
+ * Fix small offset in following distance
+ * Various small CPU optimizations
+ * Improve offroad power consumption: require NEOS Update
+ * Add default speed limits for Estonia thanks to martinl!
+ * Subaru Crosstrek support thanks to martinl!
+ * Toyota Avalon support thanks to njbrown09!
+ * Toyota Rav4 with TSS 2.0 support thanks to wocsor!
+ * Toyota Corolla with TSS 2.0 support thanks to wocsor!
+
 Version 0.5.11 (2019-04-17)
 ========================
  * Add support for Subaru
@@ -9,6 +33,8 @@ Version 0.5.11 (2019-04-17)
  * Improve performance of visiond and ui
  * Honda Passport 2019 support
  * Lexus RX Hybrid 2019 support thanks to schomems!
+ * Improve road selection heuristic in mapd
+ * Add Lane Departure Warning to dashboard for Toyota thanks to arne182
 
 Version 0.5.10 (2019-03-19)
 ========================
