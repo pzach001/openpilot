@@ -87,7 +87,7 @@ class CarInterface(object):
     self.cam_can_invalid_count = 0
 
     self.cp = get_can_parser(CP)
-    self.cp_cam = get_cam_can_parser(CP)
+    #self.cp_cam = get_cam_can_parser(CP) #Clarity
 
     # *** init the major players ***
     self.CS = CarState(CP)
@@ -198,7 +198,20 @@ class CarInterface(object):
       ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
       ret.longitudinalTuning.kiBP = [0., 35.]
       ret.longitudinalTuning.kiV = [0.54, 0.36]
-
+ 
+    elif candidate == CAR.CLARITY:
+      stop_and_go = True
+      ret.mass = 4052. * CV.LB_TO_KG + std_cargo
+      ret.wheelbase = 2.75
+      ret.centerToFront = ret.wheelbase * 0.4
+      ret.steerRatio = 17.03  # 12.72 is end-to-end spec
+      tire_stiffness_factor = 1.
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.8], [0.24]]
+      ret.longitudinalTuning.kpBP = [0., 5., 35.]
+      ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
+      ret.longitudinalTuning.kiBP = [0., 35.]
+      ret.longitudinalTuning.kiV = [0.54, 0.36]
+ 
     elif candidate in (CAR.ACCORD, CAR.ACCORD_15, CAR.ACCORDH):
       stop_and_go = True
       if not candidate == CAR.ACCORDH: # Hybrid uses same brake msg as hatch
@@ -387,10 +400,10 @@ class CarInterface(object):
     # ******************* do can recv *******************
     canMonoTimes = []
     can_valid, _ = self.cp.update(int(sec_since_boot() * 1e9), True)
-    cam_valid, _ = self.cp_cam.update(int(sec_since_boot() * 1e9), False)
-    can_rcv_error = not can_valid or not cam_valid
+    #cam_valid, _ = self.cp_cam.update(int(sec_since_boot() * 1e9), False) #Clarity
+    can_rcv_error = not can_valid #Clarity
 
-    self.CS.update(self.cp, self.cp_cam)
+    self.CS.update(self.cp) #Clarity
 
     # create message
     ret = car.CarState.new_message()
@@ -503,14 +516,14 @@ class CarInterface(object):
 
     if can_rcv_error or self.can_invalid_count >= 5:
       events.append(create_event('commIssue', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-
-    if not self.CS.cam_can_valid and self.CP.enableCamera:
-      self.cam_can_invalid_count += 1
-      # wait 1.0s before throwing the alert to avoid it popping when you turn off the car
-      if self.cam_can_invalid_count >= 100 and self.CS.CP.carFingerprint not in HONDA_BOSCH:
-        events.append(create_event('invalidGiraffeHonda', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-    else:
-      self.cam_can_invalid_count = 0
+#Clarity
+#    if not self.CS.cam_can_valid and self.CP.enableCamera:
+#      self.cam_can_invalid_count += 1
+#      # wait 1.0s before throwing the alert to avoid it popping when you turn off the car
+#      if self.cam_can_invalid_count >= 100 and self.CS.CP.carFingerprint not in HONDA_BOSCH:
+#        events.append(create_event('invalidGiraffeHonda', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+#    else:
+#      self.cam_can_invalid_count = 0
 
     if self.CS.steer_error:
       events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
@@ -608,18 +621,18 @@ class CarInterface(object):
 
     pcm_accel = int(clip(c.cruiseControl.accelOverride, 0, 1) * 0xc6)
 
-    can_sends = self.CC.update(c.enabled, self.CS, self.frame,
-                               c.actuators,
-                               c.cruiseControl.speedOverride,
-                               c.cruiseControl.override,
-                               c.cruiseControl.cancel,
-                               pcm_accel,
-                               hud_v_cruise,
-                               c.hudControl.lanesVisible,
-                               hud_show_car=c.hudControl.leadVisible,
-                               hud_alert=hud_alert,
-                               snd_beep=snd_beep,
-                               snd_chime=snd_chime)
+    self.CC.update(self.sendcan, c.enabled, self.CS, self.frame,
+                   c.actuators,
+                   c.cruiseControl.speedOverride,
+                   c.cruiseControl.override,
+                   c.cruiseControl.cancel,
+                   pcm_accel,
+                   hud_v_cruise,
+                   c.hudControl.lanesVisible,
+                   hud_show_car=c.hudControl.leadVisible,
+                   hud_alert=hud_alert,
+                   snd_beep=snd_beep,
+                   snd_chime=snd_chime)
 
     self.frame += 1
     return can_sends
