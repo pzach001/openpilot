@@ -399,9 +399,9 @@ class CarInterface(object):
   def update(self, c):
     # ******************* do can recv *******************
     canMonoTimes = []
-    can_valid, _ = self.cp.update(int(sec_since_boot() * 1e9), True)
+    can_valid, _ = self.cp.update(int(sec_since_boot() * 1e9), True) 
     #cam_valid, _ = self.cp_cam.update(int(sec_since_boot() * 1e9), False) #Clarity
-    #can_rcv_error = not can_valid #Clarity
+    can_rcv_error = not can_valid #Clarity
 
     self.CS.update(self.cp) #Clarity
 
