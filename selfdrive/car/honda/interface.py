@@ -399,9 +399,9 @@ class CarInterface(object):
   def update(self, c):
     # ******************* do can recv *******************
     canMonoTimes = []
-    can_valid, _ = self.cp.update(int(sec_since_boot() * 1e9), True) 
+    #can_valid, _ = self.cp.update(int(sec_since_boot() * 1e9), True) #Clarity
     #cam_valid, _ = self.cp_cam.update(int(sec_since_boot() * 1e9), False) #Clarity
-    can_rcv_error = not can_valid #Clarity
+    #can_rcv_error = not can_valid #Clarity
 
     self.CS.update(self.cp) #Clarity
 
@@ -514,9 +514,10 @@ class CarInterface(object):
     else:
       self.can_invalid_count = 0
 
-    if can_rcv_error or self.can_invalid_count >= 5:
-      events.append(create_event('commIssue', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-#Clarity
+#clarity
+#    if can_rcv_error or self.can_invalid_count >= 5:
+#      events.append(create_event('commIssue', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+#
 #    if not self.CS.cam_can_valid and self.CP.enableCamera:
 #      self.cam_can_invalid_count += 1
 #      # wait 1.0s before throwing the alert to avoid it popping when you turn off the car
