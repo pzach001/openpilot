@@ -1,7 +1,6 @@
 from cereal import car #Clarity
 from collections import namedtuple
 from common.realtime import sec_since_boot
-from selfdrive.boardd.boardd import can_list_to_can_capnp #Clarity
 from selfdrive.controls.lib.drive_helpers import rate_limit
 from common.numpy_fast import clip
 from selfdrive.car import create_gas_command
@@ -188,4 +187,4 @@ class CarController(object):
         idx = (frame/radar_send_step) % 4
       can_sends.extend(hondacan.create_radar_commands(CS.v_ego, CS.CP.carFingerprint, self.new_radar_config, idx))
 
-    sendcan.send(can_list_to_can_capnp(can_sends, msgtype='sendcan')) #Clarity
+    return can_sends
