@@ -1,7 +1,7 @@
 import struct
 import common.numpy_fast as np #Clarity
 from selfdrive.config import Conversions as CV
-from selfdrive.car.honda.values import CAR, HONDA_BOSCH
+from selfdrive.car.honda.values import CAR, HONDA_BOSCH, VEHICLE_STATE_MSG #Clarity
 
 # *** Honda specific ***
 def can_cksum(mm):
