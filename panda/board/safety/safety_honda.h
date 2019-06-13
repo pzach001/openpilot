@@ -177,6 +177,7 @@ const safety_hooks honda_hooks = {
   .tx_lin = nooutput_tx_lin_hook,
   .ignition = default_ign_hook,
   .fwd = nooutput_fwd_hook, //Clarity
+  .relay = nooutput_relay_hook,//Clarity
 };
 
 const safety_hooks honda_bosch_hooks = {
